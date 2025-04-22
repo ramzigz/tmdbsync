@@ -1,4 +1,12 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { Movie } from 'src/movies/entities/movie.entity';
+import { MovieGenre } from './movie-genre.entity';
 
 @Table
 export class Genre extends Model {
@@ -13,4 +21,8 @@ export class Genre extends Model {
     allowNull: false,
   })
   name: string;
+
+  // Many-to-many relationship with Movie
+  @BelongsToMany(() => Movie, () => MovieGenre)
+  movies: Movie[];
 }

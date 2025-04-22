@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Movie } from './entities/movie.entity';
 import { Op } from 'sequelize';
+import { Genre } from 'src/genres/entities/genre.entity';
 
 @Injectable()
 export class MoviesService {
@@ -16,6 +17,7 @@ export class MoviesService {
     search?: string,
     adult?: boolean,
     vote_average?: number,
+    genres?: string,
   ) {
     // Default values for pagination
     const offset = (page - 1) * limit;
@@ -25,29 +27,49 @@ export class MoviesService {
 
     if (search) {
       whereClause.title = {
-        [Op.iLike]: `%${search}%`, // Case-insensitive search for the 'title' field
+        [Op.iLike]: `%${search}%`,
       };
     }
 
     if (adult !== undefined) {
-      whereClause.adult = adult; // Add filter for adult content
+      whereClause.adult = adult;
     }
 
     if (vote_average !== undefined) {
       whereClause.vote_average = {
-        [Op.gte]: vote_average, // Add filter for minimum vote average
+        [Op.gte]: vote_average,
       };
     }
+
+    let genreIds: number[] | undefined;
+    if (genres) {
+      genreIds = genres.split(',').map((id) => parseInt(id.trim(), 10));
+    }
+
     const { rows, count } = await this.movieModel.findAndCountAll({
       where: whereClause,
+include: [
+        {
+          model: Genre,
+          attributes: ['id', 'name'],
+          through: { attributes: [] }, // Exclude join table fields
+          where: genres
+            ? {
+                id: {
+                  [Op.in]: genreIds, // Filter genres by ID
+                },
+              }
+            : undefined,
+        },
+      ],
       limit,
       offset,
-      order: [['id', 'ASC']], // Order results by ID or any other field
+      order: [['id', 'ASC']],
     });
 
     return {
-      data: rows, // The paginated list of movies
-      total: count, // Total number of movies matching the query
+      data: rows,
+      total: count,
       page,
       limit,
     };

@@ -58,18 +58,57 @@ export class MoviesController {
     type: Number,
     required: false,
     description: 'Filter movies by minimum vote average',
-    example: 7.5,
+//     example: 7.5,
+})
+  @ApiQuery({
+    name: 'genres',
+    type: String,
+    required: false,
+    description: 'Filter movies by genre IDs (comma-separated string)',
   })
   @UsePipes(new ValidationPipe({ transform: true })) // Enable transformation
   async findAll(@Query() query: FindAllMoviesDto) {
-    const { page, limit, search, adult, vote_average } = query;
+    const { page, limit, search, adult, vote_average, genres } = query;
     console.log('Transformed Parameters:', {
       page,
       limit,
       search,
       adult,
       vote_average,
+genres,
     });
-    return this.moviesService.findAll(page, limit, search, adult, vote_average);
+    return this.moviesService.findAll(
+page,
+limit,
+search,
+      adult,
+      vote_average,
+      genres,
+    );
+  }
+
+  @Post(':id/rate')
+  @ApiOperation({
+    summary: 'Rate a movie',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the updated average rating of the movie.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Movie not found.',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async rateMovie(
+    @Param('id') movieId: number,
+    @Body() rateMovieDto: RateMovieDto,
+  ) {
+    const { rating } = rateMovieDto;
+    return this.moviesService.rateMovie(movieId, rating);
   }
 }

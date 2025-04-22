@@ -1,4 +1,12 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { Genre } from 'src/genres/entities/genre.entity';
+import { MovieGenre } from 'src/genres/entities/movie-genre.entity';
 
 @Table
 export class Movie extends Model {
@@ -68,10 +76,12 @@ export class Movie extends Model {
   })
   vote_count: number;
 
-  @Column({
-    type: DataType.JSONB,
-  })
-  genres: any[];
+  // @Column(DataType.ARRAY(DataType.INTEGER))
+  // genres: number[];
+
+  // Many-to-many relationship with Genre
+  @BelongsToMany(() => Genre, () => MovieGenre)
+  genres: Genre[];
 
   @Column({
     type: DataType.STRING,

@@ -142,7 +142,7 @@ export class TmdbService {
               : results;
 
           for (const movie of moviesToProcess) {
-            await this.movieModel.upsert({
+            const [createdMovie] = await this.movieModel.upsert({
               id: movie.id,
               adult: movie.adult,
               original_language: movie.original_language,
@@ -154,8 +154,10 @@ export class TmdbService {
               title: movie.title,
               vote_average: movie.vote_average,
               vote_count: movie.vote_count,
-              genres: movie.genre_ids,
             });
+
+            // Associate genres with the movie
+            await createdMovie.$set('genres', movie.genre_ids);
           }
 
           moviesSynced += moviesToProcess.length;

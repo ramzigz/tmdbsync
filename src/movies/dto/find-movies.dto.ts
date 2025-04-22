@@ -45,4 +45,8 @@ export class FindAllMoviesDto {
   })
   @Min(0)
   vote_average?: number;
+
+  @IsOptional()
+  @IsString()
+  genres?: string;
 }
