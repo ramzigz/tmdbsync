@@ -10,18 +10,21 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "src/*": ["./src/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noImplicitAny": true, // Enable this for stricter type checking
+    "strictBindCallApply": true, // Enable this for stricter function binding checks
+    "noFallthroughCasesInSwitch": true // Enable this to catch switch-case fallthroughs
   },
   "include": [
     "src/**/*",
     "test/**/*",
-    "jest.config.js"
+    "jest.config.ts"
   ],
   "exclude": [
     "node_modules",
