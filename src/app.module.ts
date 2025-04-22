@@ -7,6 +7,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { MoviesModule } from './movies/movies.module';
 import { GenresModule } from './genres/genres.module';
 import { TmdbModule } from './tmdb/tmdb.module';
+import { MovieWatchlistModule } from './movie-watchlist/movie-watchlist.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TmdbModule } from './tmdb/tmdb.module';
     MoviesModule,
     GenresModule,
     TmdbModule,
+    MovieWatchlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
