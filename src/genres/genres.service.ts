@@ -12,8 +12,4 @@ export class GenresService {
   async findAll() {
     return this.genreModel.findAll();
   }
-
-  async findOne(id: number) {
-    return this.genreModel.findByPk(id);
-  }
 }
