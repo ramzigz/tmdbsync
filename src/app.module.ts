@@ -25,6 +25,8 @@ import { MovieWatchlistModule } from './movie-watchlist/movie-watchlist.module';
         database: configService.get('DB_DATABASE', 'tmdbsync'),
         autoLoadModels: true,
         synchronize: true,
+        retryAttempts: 10, // Increase retry attempts
+        retryDelay: 3000, // Increase retry delay (3 seconds)
       }),
       inject: [ConfigService],
     }),
