@@ -1,6 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
+  Param,
+  Post,
   Query,
   UsePipes,
   ValidationPipe,
@@ -8,6 +11,7 @@ import {
 import { MoviesService } from './movies.service';
 import { FindAllMoviesDto } from './dto/find-movies.dto';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { RateMovieDto } from './dto/rate-movie.dto';
 
 @Controller('movies')
 export class MoviesController {
@@ -58,8 +62,8 @@ export class MoviesController {
     type: Number,
     required: false,
     description: 'Filter movies by minimum vote average',
-//     example: 7.5,
-})
+    // example: 7.5,
+  })
   @ApiQuery({
     name: 'genres',
     type: String,
@@ -75,12 +79,12 @@ export class MoviesController {
       search,
       adult,
       vote_average,
-genres,
+      genres,
     });
     return this.moviesService.findAll(
-page,
-limit,
-search,
+      page,
+      limit,
+      search,
       adult,
       vote_average,
       genres,

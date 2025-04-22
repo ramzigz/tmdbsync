@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Movie } from './entities/movie.entity';
 import { Op } from 'sequelize';
@@ -19,10 +19,8 @@ export class MoviesService {
     vote_average?: number,
     genres?: string,
   ) {
-    // Default values for pagination
     const offset = (page - 1) * limit;
 
-    // Define the whereClause with a proper type
     const whereClause: Partial<Record<string, any>> = {};
 
     if (search) {
@@ -48,7 +46,7 @@ export class MoviesService {
 
     const { rows, count } = await this.movieModel.findAndCountAll({
       where: whereClause,
-include: [
+      include: [
         {
           model: Genre,
           attributes: ['id', 'name'],
@@ -75,7 +73,26 @@ include: [
     };
   }
 
-  async findOne(id: number) {
-    return this.movieModel.findByPk(id);
+  async rateMovie(movieId: number, rating: number) {
+    // Validate that the movie exists
+    const movie = await this.movieModel.findByPk(movieId, { raw: true });
+    if (!movie) {
+      throw new NotFoundException('Movie not found'); // Return HTTP 404 error
+    }
+
+    // Calculate the new average rating
+    const totalVotes = movie.vote_count * movie.vote_average; // Total sum of all ratings so far
+    const newVoteCount = movie.vote_count + 1; // Increment the vote count
+    const newVoteAverage = parseFloat(
+      ((totalVotes + rating) / newVoteCount).toFixed(3),
+    );
+
+    // Update the movie's vote_average and vote_count directly
+    await this.movieModel.update(
+      { vote_average: newVoteAverage, vote_count: newVoteCount },
+      { where: { id: movieId } },
+    );
+
+    return { vote_average: newVoteAverage, vote_count: newVoteCount };
   }
 }
