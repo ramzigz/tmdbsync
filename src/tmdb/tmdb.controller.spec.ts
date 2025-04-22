@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MovieWatchlistService } from './movie-watchlist.service';
 import { Movie } from '../movies/entities/movie.entity';
-import { MovieWatchlist } from './entities/movie-watchlist.entity';
 import { getModelToken } from '@nestjs/sequelize';
 import { Model } from 'sequelize';
+import { MovieWatchlistService } from 'src/movie-watchlist/movie-watchlist.service';
+import { MovieWatchlist } from 'src/movie-watchlist/entities/movie-watchlist.entity';
 
 // Generic mock instance creator
 const createMockInstance = <T extends {}>(data: Partial<T>): T & Model =>
@@ -111,4 +111,35 @@ describe('MovieWatchlistService', () => {
 
       expect(result).toEqual([mockMovie.toJSON()]);
       expect(watchlistModel.findAll).toHaveBeenCalledWith({
-        where: { userId:
+        where: { userId: 'user1', isInWatchlist: true },
+        include: [
+          {
+            model: Movie,
+            attributes: ['id', 'title', 'overview', 'vote_average'],
+          },
+        ],
+      });
+    });
+  });
+
+  describe('removeFromWatchlist', () => {
+    it('should remove a movie from the watchlist', async () => {
+      const mockWatchlistEntry = createMockInstance<MovieWatchlist>({
+        userId: 'user1',
+        movieId: 1,
+        isInWatchlist: true,
+      });
+
+      watchlistModel.findOne = jest.fn().mockResolvedValue(mockWatchlistEntry);
+
+      const result = await service.removeFromWatchlist({
+        userId: 'user1',
+        movieId: 1,
+      });
+
+      expect(result).toEqual({ message: 'Movie removed from watchlist' });
+      expect(mockWatchlistEntry.isInWatchlist).toBe(false);
+      expect(mockWatchlistEntry.save).toHaveBeenCalled();
+    });
+  });
+});
