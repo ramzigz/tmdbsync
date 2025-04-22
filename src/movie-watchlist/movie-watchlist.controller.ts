@@ -4,6 +4,7 @@ import {
   Body,
   Get,
   Query,
+  Delete,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -49,5 +50,24 @@ export class MovieWatchlistController {
   })
   async getWatchlist(@Query('userId') userId: string) {
     return this.movieWatchlistService.getWatchlist(userId);
+  }
+
+  @Delete()
+  @ApiOperation({
+    summary: "Remove a movie from the user's watchlist",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Movie successfully removed from the watchlist.',
+  })
+  @ApiBody({
+    type: MovieWatchlistDto,
+    description: 'Details to remove a movie from the watchlist',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async removeFromWatchlist(@Body() removeFromWatchlistDto: MovieWatchlistDto) {
+    return this.movieWatchlistService.removeFromWatchlist(
+      removeFromWatchlistDto,
+    );
   }
 }

@@ -47,4 +47,22 @@ export class MovieWatchlistService {
 
     return watchlist.map((entry) => entry.get('movie'));
   }
+
+  async removeFromWatchlist(removeFromWatchlistDto: MovieWatchlistDto) {
+    const { userId, movieId } = removeFromWatchlistDto;
+
+    const watchlistEntry = await this.movieWatchlistModel.findOne({
+      where: { userId, movieId },
+    });
+
+    if (!watchlistEntry) {
+      throw new NotFoundException('Movie not found in watchlist');
+    }
+
+    // Mark the movie as removed from the watchlist
+    watchlistEntry.isInWatchlist = false;
+    await watchlistEntry.save();
+
+    return { message: 'Movie removed from watchlist' };
+  }
 }
